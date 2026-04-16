@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Agent Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-mesh"></div>
+    <div class="container">
+        
+        <header>
+            <h1><span class="gradient-text">Deliberate</span> Information Asymmetry</h1>
+            <p>Multi-Agent Hallucination Mitigation Dashboard</p>
+        </header>
+
+        <div class="context-section glass-panel" style="margin-bottom: 2rem;">
+            <h2>Raw Database Context <span class="badge" style="background:var(--success);">Ground Truth</span></h2>
+            <div class="context-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
+                <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(14, 165, 233, 0.2);">
+                    <h3 style="color: var(--accent-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Vector DB (Unstructured Text)</h3>
+                    <ul style="list-style-type: square; margin-left: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                        <li>Patient John Doe (ID: 1001) visited the clinic on 2026-03-01 complaining of severe headaches and mild fever.</li>
+                        <li>Dr. Smith diagnosed John Doe with 'Syndromia', a neurological condition.</li>
+                        <li>The standard treatment for Syndromia is a 500mg daily dose of 'Medicane' for two weeks.</li>
+                        <li>John Doe's medical history indicates a severe allergic reaction to Penicillin and Amoxicillin.</li>
+                        <li>Follow-up for John Doe is scheduled for 2026-04-15 to monitor Medicane effects.</li>
+                    </ul>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(109, 40, 217, 0.2);">
+                    <h3 style="color: var(--accent); font-size: 1.1rem; margin-bottom: 1rem;">Graph DB (Neo4j Strict Triads)</h3>
+                    <div class="mermaid" style="text-align: center;">
+                    graph TD
+                        A([John Doe]) -->|DIAGNOSED_WITH| B([Syndromia])
+                        B -->|TREATED_WITH| C([Medicane, 500mg])
+                        A -->|ALLERGIC_TO| D([Penicillin])
+                        A -->|ALLERGIC_TO| E([Amoxicillin])
+                        F([Dr. Smith]) -->|TREATS| A
+                        style A fill:#6d28d9,stroke:#6d28d9,color:#fff
+                        style B fill:#6d28d9,stroke:#6d28d9,color:#fff
+                        style C fill:#6d28d9,stroke:#6d28d9,color:#fff
+                        style D fill:#ef4444,stroke:#ef4444,color:#fff
+                        style E fill:#ef4444,stroke:#ef4444,color:#fff
+                        style F fill:#0ea5e9,stroke:#0ea5e9,color:#fff
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <section class="query-section glass-panel">
+                <h2>Query Engine</h2>
+                <div class="input-group">
+                    <div style="margin-bottom: 0.5rem;">
+                        <label for="sampleQuestions" style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Quick Test (Select a sample or type your own):</label>
+                        <select id="sampleQuestions" class="premium-select">
+                            <option value="">-- Choose a Sample Presentation Question --</option>
+                            <optgroup label="✅ Safe Queries (100% Valid)">
+                                <option value="Who is John Doe's doctor, and what condition was he diagnosed with?">1. Who is John Doe's doctor and what condition was he diagnosed with?</option>
+                                <option value="What medication is currently used to treat Syndromia, and what is the proper dosage?">2. What medication is used to treat Syndromia, and what is the dosage?</option>
+                                <option value="When did John Doe visit the clinic, and what symptoms did he complain of?">3. When did John Doe visit the clinic and what were his symptoms?</option>
+                                <option value="When is John Doe scheduled for his follow-up appointment?">4. When is John Doe scheduled for his follow-up appointment?</option>
+                            </optgroup>
+                            <optgroup label="⚠️ Hallucination Triggers (Checker should Veto)">
+                                <option value="Was John Doe treated with 500mg of Penicillin for his headaches?">5. Was John Doe treated with 500mg of Penicillin for his headaches?</option>
+                                <option value="Did Dr. Smith diagnose John Doe with Amoxicillin dependency?">6. Did Dr. Smith diagnose John Doe with Amoxicillin dependency?</option>
+                                <option value="Is Syndromia a terminal form of heart disease?">7. Is Syndromia a terminal form of heart disease?</option>
+                                <option value="Was John Doe instructed to take Medicane for four weeks?">8. Was John Doe instructed to take Medicane for four weeks?</option>
+                            </optgroup>
+                            <optgroup label="🚫 Out-of-Bounds Context (Checker should Veto)">
+                                <option value="Are there any alternative homeopathic remedies for Syndromia, or dietary changes John Doe should follow?">9. Are there alternative homeopathic remedies for Syndromia?</option>
+                                <option value="What is the capital of France, and does Dr. Smith speak French?">10. What is the capital of France, and does Dr. Smith speak French?</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <textarea id="queryInput" placeholder="Or ask your own custom medical or legal question here..."></textarea>
+                    <button id="submitBtn">Execute Workflow</button>
+                </div>
+
+                <div class="agent-viz">
+                    <div class="node" id="node-retrieve">
+                        <div class="dot"></div>
+                        <p>Retrieve</p>
+                    </div>
+                    <div class="edge"></div>
+                    <div class="node" id="node-solver">
+                        <div class="dot"></div>
+                        <p>Solver</p>
+                    </div>
+                    <div class="edge"></div>
+                    <div class="node" id="node-proposer">
+                        <div class="dot"></div>
+                        <p>Proposer</p>
+                    </div>
+                    <div class="edge"></div>
+                    <div class="node" id="node-checker">
+                        <div class="dot"></div>
+                        <p>Checker</p>
+                    </div>
+                    <div class="edge"></div>
+                    <div class="node" id="node-synth">
+                        <div class="dot"></div>
+                        <p>Synthesizer</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="results-section glass-panel" id="resultsPanel" style="display: none;">
+                <div class="score-card">
+                    <h3>Confidence Score</h3>
+                    <div class="score-circle">
+                        <span id="scoreText">100%</span>
+                    </div>
+                    <p id="hallucinationAlert" class="alert"></p>
+                </div>
+
+                <div class="output-card">
+                    <h3>Final Sanitized Response</h3>
+                    <div class="response-text" id="finalResponse"></div>
+                </div>
+
+                <div class="logs-card" id="checkerLogsSection" style="display: none;">
+                    <h3>Checker Agent Audit Logs <span class="badge">Blinded</span></h3>
+                    <ul id="checkerLogsList" class="checker-logs">
+                        <!-- Logs will be injected here -->
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true, 
+            theme: 'base',
+            themeVariables: {
+                primaryColor: 'transparent',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#6d28d9',
+                lineColor: '#94a3b8',
+                textColor: '#f8fafc',
+                fontFamily: 'Inter'
+            }
+        });
+    </script>
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+langgraph
+langchain
+langchain-community
+chromadb
+neo4j
+pydantic
+sentence-transformers

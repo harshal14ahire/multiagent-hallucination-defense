@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# Local data / build artifacts (too large / reproducible)
+chroma_db/
+data/*.csv
+data/*.zip
+results/
+*.log
+
+# Editor / IDE
+.vscode/
+.idea/
+.claude/
+
+# Credentials (defense in depth — should never appear)
+.env
+.env.*
+*.pem
+*.key
+kaggle.json
