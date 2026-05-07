@@ -14,7 +14,8 @@ env/
 chroma_db/
 data/*.csv
 data/*.zip
-results/
+results/*
+!results/metrics.csv
 *.log
 
 # Editor / IDE
